@@ -1,0 +1,76 @@
+<!doctype html>
+<html class="no-js" lang="">
+  <head>
+    <meta charset="utf-8">
+    <title>Interval Timer</title>
+    <meta name="description" content="Interval Timer">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/main.css">
+    <meta name="theme-color" content="#fafafa">
+  </head>
+
+  <body>
+    <div id="overlay"></div>
+
+    <div id="content">
+      <div class="content__item content__item--resting">
+        <p id="rest">Rest</p>
+      </div>
+      <div class="content__item content__item--workout">
+        <p class="conent__item__text">Repetitions:
+        <span class="content__item__text__number">
+          <span id="repetition__counter">x</span>
+          /
+          <span id="repetition__maximum">x</span>
+        </span>
+        </p>
+      </div>
+      <div class="content__item content__item--workout">
+        <p class="conent__item__text">Moves:
+        <span class="content__item__text__number">
+          <span id="move__counter">x</span>
+          /
+          <span id="move__maximum">x</span>
+        </span>
+        </p>
+      </div>
+      <div class="content__item content__item--workout">
+        <p class="conent__item__text">Time:
+        <span class="content__item__text__number">
+          <span id="interval__counter">x</span>
+          /
+          <span id="interval__maximum">x</span>
+        </span>
+        </p>
+      </div>
+      <div class="content__item content__item--ready-set-go">
+        <p id="ready-set-go">
+        <span id="ready">ready</span>
+        <span id="set">set</span>
+        <span id="go">go</span>
+        </p>
+      </div>
+    </div>
+
+    <form id="timer-settings">
+      <div class="form__item">
+        <p>Total time: <span id="total-time">00:00</span></p>
+      </div>
+      <div class="form__item">
+        <label id="move__input__label" for="move__input">Moves</label>
+        <input id="move__input" name="move__input" type="number">
+      </div>
+      <div class="form__item">
+        <label id="repetition__input__label" for="repetition__input">Repetitions</label>
+        <input id="repetition__input" name="repetition__input" type="number">
+      </div>
+      <div class="form__item">
+        <button id="timer-settings__submit" type="submit">Submit</button>
+      </div>
+    </form>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
