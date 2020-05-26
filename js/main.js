@@ -26,12 +26,14 @@ const domRepetitionCounter = document.getElementById('repetition__counter');
 const domRepetitionMaximum = document.getElementById('repetition__maximum');
 
 function calculateTotalWorkoutTime(moveCount, reps, moveTime) {
-    const totalSeconds = (moveTime * moveCount) * reps + (reps * moveTime);
-    const totalMinutes = (totalSeconds / 60);
+    const timeSpentDoingMoves = ((moveTime * moveCount) * reps);
+    const timeSpentResting = ((reps - 1) * moveTime);
+    const timeSpentReadySetGo = ((reps - 1) * moveCount * 4);
+    const totalMinutes = (timeSpentDoingMoves + timeSpentResting + timeSpentReadySetGo) / 60;
     const minutes = Math.floor(totalMinutes);
 
     return {
-        seconds: (totalMinutes - minutes) * 60,
+        seconds: Math.round((totalMinutes - minutes) * 60),
         minutes,
     };
 }
