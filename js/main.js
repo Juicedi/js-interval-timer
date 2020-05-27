@@ -1,3 +1,4 @@
+const restTimeMultiplier = 0.5;
 const interval = 30;
 let second = 0;
 
@@ -27,7 +28,7 @@ const domRepetitionMaximum = document.getElementById('repetition__maximum');
 
 function calculateTotalWorkoutTime(moveCount, reps, moveTime) {
     const timeSpentDoingMoves = ((moveTime * moveCount) * reps);
-    const timeSpentResting = ((reps - 1) * moveTime);
+    const timeSpentResting = ((reps - 1) * moveTime * restTimeMultiplier);
     const timeSpentReadySetGo = ((reps - 1) * moveCount * 4);
     const totalMinutes = (timeSpentDoingMoves + timeSpentResting + timeSpentReadySetGo) / 60;
     const minutes = Math.floor(totalMinutes);
@@ -74,7 +75,10 @@ function stepClasses(classes) {
 function iterate() {
     second += 1;
 
-    if (second < interval) {
+    if (
+        (rest === true && second < Math.round(interval * restTimeMultiplier))
+        || (rest === false && second < interval)
+    ) {
         paint();
         return null;
     }
@@ -91,6 +95,7 @@ function iterate() {
         if (repetition < repetitions - 1) {
             rest = true;
             domContent.classList.add('resting');
+            domIntervalMaximum.innerText = Math.round(interval * restTimeMultiplier);
             paint();
             return null;
         }
@@ -99,6 +104,7 @@ function iterate() {
     repetition += 1;
     move = 0;
     rest = false;
+    domIntervalMaximum.innerText = interval;
     domContent.classList.remove('resting');
 
     if (repetition >= repetitions) {
