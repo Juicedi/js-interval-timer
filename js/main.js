@@ -1,14 +1,11 @@
 const restTimeMultiplier = 0.5;
-const interval = 30;
-let second = 0;
+const interval = 4;
 
+let second = 0;
 let moves = 0;
 let move = 0;
-
 let repetitions = 0;
 let repetition = 0;
-
-let rest = false;
 let intervalTimer = null;
 
 const form = document.getElementById('timer-settings');
@@ -39,7 +36,28 @@ function calculateTotalWorkoutTime(moveCount, reps, moveTime) {
     };
 }
 
-function paint() {
+function paint(special) {
+    switch (special) {
+        case 'ready':
+            domContent.classList.remove('resting');
+            domContent.classList.add('ready');
+            domIntervalMaximum.innerText = interval;
+            break;
+        case 'normal':
+            domContent.classList.remove('resting');
+            domIntervalMaximum.innerText = interval;
+            break;
+        case 'resting':
+            domContent.classList.add('resting');
+            domIntervalMaximum.innerText = Math.round(interval * restTimeMultiplier);
+            break;
+        case 'submit':
+            domMoveMaximum.innerText = moves;
+            domRepetitionMaximum.innerText = repetitions;
+            domIntervalMaximum.innerText = interval;
+            break;
+    }
+
     domMoveCounter.innerText = move + 1;
     domRepetitionCounter.innerText = repetition + 1;
     domIntervalCounter.innerText = second + 1;
@@ -72,50 +90,6 @@ function stepClasses(classes) {
     return loop(classes);
 }
 
-function iterate() {
-    second += 1;
-
-    if (
-        (rest === true && second < Math.round(interval * restTimeMultiplier))
-        || (rest === false && second < interval)
-    ) {
-        paint();
-        return null;
-    }
-
-    second = 0;
-
-    if (rest === false) {
-        if (move + 1 < moves) {
-            move += 1;
-            paint();
-            return 'rsg';
-        }
-
-        if (repetition < repetitions - 1) {
-            rest = true;
-            domContent.classList.add('resting');
-            domIntervalMaximum.innerText = Math.round(interval * restTimeMultiplier);
-            paint();
-            return null;
-        }
-    }
-
-    repetition += 1;
-    move = 0;
-    rest = false;
-    domIntervalMaximum.innerText = interval;
-    domContent.classList.remove('resting');
-
-    if (repetition >= repetitions) {
-        stopTimer();
-        return null;
-    }
-
-    paint();
-    return 'rsg';
-}
-
 function updateValues() {
     moves = parseInt(moveInput.value, 10);
     repetitions = parseInt(repetitionInput.value, 10);
@@ -125,31 +99,88 @@ function submit() {
     move = 0;
     repetition = 0;
     second = 0;
-    domMoveMaximum.innerText = moves;
-    domRepetitionMaximum.innerText = repetitions;
-    domIntervalMaximum.innerText = interval;
-    paint();
+    paint('submit');
     form.style.opacity = 0;
     form.style.pointerEvents = 'none';
 }
 
 function startTimer() {
+    const restTime = Math.round(interval * restTimeMultiplier);
     const classes = ['ready', 'set', 'go'];
     let classStepper = null;
-    let stage = 'rsg';
+
+    const stages = {
+        readySetGo: 0,
+        rest: 1,
+        train: 2,
+    };
+
+    let stage = stages.readySetGo;
 
     if (intervalTimer !== null) {
         clearInterval(intervalTimer);
     }
 
     intervalTimer = setInterval(() => {
-        if (stage === 'rsg') {
-            stage = null;
-            classStepper = stepClasses(classes);
-        } else if (typeof classStepper === 'function') {
-            classStepper = classStepper(classes);
-        } else {
-            stage = iterate();
+        switch (stage) {
+            case stages.readySetGo:
+                if (classStepper === null) {
+                    paint('ready');
+                    classStepper = stepClasses(classes)
+                } else {
+                    classStepper = classStepper(classes);
+                }
+
+                if (classStepper !== null) {
+                    break;
+                }
+
+                stage = stages.train;
+                break;
+            case stages.rest:
+                second += 1;
+                paint();
+
+                if (second >= restTime - 1) {
+                    second = 0;
+                    stage = stages.readySetGo;
+                }
+                break;
+            case stages.train:
+                second += 1;
+
+                if (second < interval) {
+                    paint();
+                    break;
+                }
+
+                second = 0;
+
+                if (move + 1 < moves) {
+                    move += 1;
+                    paint();
+                    stage = stages.readySetGo;
+                    break;
+                }
+
+                if (repetition < repetitions - 1) {
+                    repetition += 1;
+                    move = 0;
+                    stage = stages.rest;
+                    paint('resting');
+                    break;
+                }
+
+                repetition += 1;
+
+                if (repetition >= repetitions) {
+                    stopTimer();
+                    stage = stages.end;
+                    break;
+                }
+                break;
+            default:
+                throw new Error('You should not get here.');
         }
     }, 1000);
 }
