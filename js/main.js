@@ -1,6 +1,5 @@
-const restTimeMultiplier = 0.5;
-const interval = 4;
-
+let restTimeMultiplier = 0.5;
+let moveTime = 4;
 let second = 0;
 let moves = 0;
 let move = 0;
@@ -15,6 +14,9 @@ const domContent = document.getElementById('content');
 const domIntervalCounter = document.getElementById('interval__counter');
 const domIntervalMaximum = document.getElementById('interval__maximum');
 
+const timeInput = document.getElementById('time__input');
+const restInput = document.getElementById('rest__input');
+
 const moveInput = document.getElementById('move__input');
 const domMoveCounter = document.getElementById('move__counter');
 const domMoveMaximum = document.getElementById('move__maximum');
@@ -23,10 +25,10 @@ const repetitionInput = document.getElementById('repetition__input');
 const domRepetitionCounter = document.getElementById('repetition__counter');
 const domRepetitionMaximum = document.getElementById('repetition__maximum');
 
-function calculateTotalWorkoutTime(moveCount, reps, moveTime) {
-    const timeSpentDoingMoves = ((moveTime * moveCount) * reps);
-    const timeSpentResting = ((reps - 1) * moveTime * restTimeMultiplier);
-    const timeSpentReadySetGo = ((reps - 1) * moveCount * 4);
+function calculateTotalWorkoutTime() {
+    const timeSpentDoingMoves = ((moveTime * moves) * repetitions);
+    const timeSpentResting = ((repetitions - 1) * moveTime * restTimeMultiplier);
+    const timeSpentReadySetGo = ((repetitions - 1) * moves * 4);
     const totalMinutes = (timeSpentDoingMoves + timeSpentResting + timeSpentReadySetGo) / 60;
     const minutes = Math.floor(totalMinutes);
 
@@ -41,23 +43,23 @@ function paint(special) {
         case 'ready':
             domContent.classList.remove('resting');
             domContent.classList.add('ready');
-            domIntervalMaximum.innerText = interval;
+            domIntervalMaximum.innerText = moveTime;
             break;
         case 'normal':
             domContent.classList.remove('resting');
-            domIntervalMaximum.innerText = interval;
+            domIntervalMaximum.innerText = moveTime;
             break;
         case 'resting':
             domContent.classList.add('resting');
-            domIntervalMaximum.innerText = Math.round(interval * restTimeMultiplier);
+            domIntervalMaximum.innerText = Math.round(moveTime * restTimeMultiplier);
             break;
         case 'reset':
             domMoveMaximum.innerText = moves;
             domRepetitionMaximum.innerText = repetitions;
-            domIntervalMaximum.innerText = interval;
+            domIntervalMaximum.innerText = moveTime;
             break;
         default:
-            throw new Error('You should not able to get here.');
+            break;
     }
 
     domMoveCounter.innerText = move + 1;
@@ -93,6 +95,8 @@ function stepClasses(classes) {
 }
 
 function updateValues() {
+    moveTime = parseInt(timeInput.value, 10);
+    restTimeMultiplier = parseFloat(restInput.value, 10);
     moves = parseInt(moveInput.value, 10);
     repetitions = parseInt(repetitionInput.value, 10);
 }
@@ -105,7 +109,7 @@ function reset() {
 }
 
 function startTimer() {
-    const restTime = Math.round(interval * restTimeMultiplier);
+    const restTime = Math.round(moveTime * restTimeMultiplier);
     const classes = ['ready', 'set', 'go'];
     let classStepper = null;
 
@@ -156,7 +160,7 @@ function startTimer() {
                 second += 1;
 
                 if (
-                    second >= interval - 2
+                    second >= moveTime - 2
                     && move + 1 >= moves
                     && repetition >= repetitions - 1
                 ) {
@@ -167,7 +171,7 @@ function startTimer() {
                     break;
                 }
 
-                if (second < interval) {
+                if (second < moveTime) {
                     paint();
                     break;
                 }
@@ -202,11 +206,13 @@ function zeroPad(value) {
 
 function onInputChange() {
     updateValues();
-    const times = calculateTotalWorkoutTime(moves, repetitions, interval);
+    const times = calculateTotalWorkoutTime();
     domTotalTime.innerText = `${zeroPad(times.minutes)}:${zeroPad(times.seconds)}`;
 }
 
 moveInput.onkeyup = onInputChange;
+timeInput.onkeyup = onInputChange;
+restInput.onkeyup = onInputChange;
 repetitionInput.onkeyup = onInputChange;
 
 form.onsubmit = (e) => {

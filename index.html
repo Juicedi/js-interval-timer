@@ -59,12 +59,20 @@
         <p>Total time: <span id="total-time">00:00</span></p>
       </div>
       <div class="form__item">
+        <label id="time__input__label" for="time__input">Move time</label>
+        <input id="time__input" name="time__input" type="number" value=30 required min=1 autofocus>
+      </div>
+      <div class="form__item">
+        <label id="rest__input__label" for="rest__input">Rest multiplier</label>
+        <input id="rest__input" name="rest__input" type="number" required min=1 value=0.5 step=0.1>
+      </div>
+      <div class="form__item">
         <label id="move__input__label" for="move__input">Moves</label>
-        <input id="move__input" name="move__input" type="number">
+        <input id="move__input" name="move__input" type="number" required min=1 value=1>
       </div>
       <div class="form__item">
         <label id="repetition__input__label" for="repetition__input">Repetitions</label>
-        <input id="repetition__input" name="repetition__input" type="number">
+        <input id="repetition__input" name="repetition__input" type="number" required min=1 value=1>
       </div>
       <div class="form__item">
         <button id="timer-settings__submit" type="submit">Submit</button>
