@@ -51,11 +51,13 @@ function paint(special) {
             domContent.classList.add('resting');
             domIntervalMaximum.innerText = Math.round(interval * restTimeMultiplier);
             break;
-        case 'submit':
+        case 'reset':
             domMoveMaximum.innerText = moves;
             domRepetitionMaximum.innerText = repetitions;
             domIntervalMaximum.innerText = interval;
             break;
+        default:
+            throw new Error('You should not able to get here.');
     }
 
     domMoveCounter.innerText = move + 1;
@@ -95,13 +97,11 @@ function updateValues() {
     repetitions = parseInt(repetitionInput.value, 10);
 }
 
-function submit() {
+function reset() {
     move = 0;
     repetition = 0;
     second = 0;
-    paint('submit');
-    form.style.opacity = 0;
-    form.style.pointerEvents = 'none';
+    paint('reset');
 }
 
 function startTimer() {
@@ -113,6 +113,7 @@ function startTimer() {
         readySetGo: 0,
         rest: 1,
         train: 2,
+        end: 3,
     };
 
     let stage = stages.readySetGo;
@@ -123,10 +124,15 @@ function startTimer() {
 
     intervalTimer = setInterval(() => {
         switch (stage) {
+            case stages.end:
+                second += 1;
+                paint();
+                stopTimer();
+                break;
             case stages.readySetGo:
                 if (classStepper === null) {
                     paint('ready');
-                    classStepper = stepClasses(classes)
+                    classStepper = stepClasses(classes);
                 } else {
                     classStepper = classStepper(classes);
                 }
@@ -148,6 +154,18 @@ function startTimer() {
                 break;
             case stages.train:
                 second += 1;
+
+                if (
+                    second >= interval - 2
+                    && move + 1 >= moves
+                    && repetition >= repetitions - 1
+                ) {
+                    /* The end stage will paint the last second tick and stop
+                     * the timer from ticking. */
+                    paint();
+                    stage = stages.end;
+                    break;
+                }
 
                 if (second < interval) {
                     paint();
@@ -171,13 +189,6 @@ function startTimer() {
                     break;
                 }
 
-                repetition += 1;
-
-                if (repetition >= repetitions) {
-                    stopTimer();
-                    stage = stages.end;
-                    break;
-                }
                 break;
             default:
                 throw new Error('You should not get here.');
@@ -200,6 +211,8 @@ repetitionInput.onkeyup = onInputChange;
 
 form.onsubmit = (e) => {
     e.preventDefault();
-    submit();
+    reset();
+    form.style.opacity = 0;
+    form.style.pointerEvents = 'none';
     startTimer();
 };
