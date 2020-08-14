@@ -14,6 +14,6 @@ module.exports = {
     ecmaVersion: 2018,
   },
   rules: {
-      "indent": ["error", 4, {"switchCase": 2]
+      "indent": ["error", 4, {"SwitchCase": 1}]
   },
 };
